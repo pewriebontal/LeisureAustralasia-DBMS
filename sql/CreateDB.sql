@@ -19,7 +19,7 @@ GO
 -- Create Tables
 
 -- Hotel Table
-CREATE TABLE Hotel 
+CREATE TABLE Hotel
 (
     hotel_id INT IDENTITY PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
@@ -30,7 +30,7 @@ CREATE TABLE Hotel
 );
 
 -- Facility Table
-CREATE TABLE Facility 
+CREATE TABLE Facility
 (
     facility_id INT IDENTITY PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
@@ -41,7 +41,7 @@ CREATE TABLE Facility
 );
 
 -- FacilityType Table
-CREATE TABLE FacilityType 
+CREATE TABLE FacilityType
 (
     type_id INT IDENTITY PRIMARY KEY,
     name VARCHAR(50) NOT NULL,
@@ -50,7 +50,7 @@ CREATE TABLE FacilityType
 );
 
 -- ServiceCategory Table
-CREATE TABLE ServiceCategory 
+CREATE TABLE ServiceCategory
 (
     code VARCHAR(10) PRIMARY KEY,
     name VARCHAR(50) NOT NULL,
@@ -59,7 +59,7 @@ CREATE TABLE ServiceCategory
 );
 
 -- ServiceItem Table
-CREATE TABLE ServiceItem 
+CREATE TABLE ServiceItem
 (
     service_id INT IDENTITY PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
@@ -75,7 +75,7 @@ CREATE TABLE ServiceItem
 );
 
 -- FacilityServiceItem Table (Associative Entity)
-CREATE TABLE FacilityServiceItem 
+CREATE TABLE FacilityServiceItem
 (
     facility_id INT,
     service_id INT,
@@ -85,7 +85,7 @@ CREATE TABLE FacilityServiceItem
 );
 
 -- Employee Table
-CREATE TABLE Employee 
+CREATE TABLE Employee
 (
     employee_id INT IDENTITY PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
@@ -93,7 +93,7 @@ CREATE TABLE Employee
 );
 
 -- AdvertisedServicePackage Table
-CREATE TABLE AdvertisedServicePackage 
+CREATE TABLE AdvertisedServicePackage
 (
     asp_id INT IDENTITY PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
@@ -111,7 +111,7 @@ CREATE TABLE AdvertisedServicePackage
 );
 
 -- PackageServiceItem Table (Associative Entity)
-CREATE TABLE PackageServiceItem 
+CREATE TABLE PackageServiceItem
 (
     asp_id INT,
     service_id INT,
@@ -122,7 +122,7 @@ CREATE TABLE PackageServiceItem
 );
 
 -- Customer Table
-CREATE TABLE Customer 
+CREATE TABLE Customer
 (
     customer_id INT IDENTITY PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
@@ -132,7 +132,7 @@ CREATE TABLE Customer
 );
 
 -- Guest Table
-CREATE TABLE Guest 
+CREATE TABLE Guest
 (
     guest_id INT IDENTITY PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
@@ -142,7 +142,7 @@ CREATE TABLE Guest
 );
 
 -- Reservation Table
-CREATE TABLE Reservation 
+CREATE TABLE Reservation
 (
     reservation_number INT IDENTITY PRIMARY KEY,
     customer_id INT,
@@ -153,7 +153,7 @@ CREATE TABLE Reservation
 );
 
 -- Booking Table
-CREATE TABLE Booking 
+CREATE TABLE Booking
 (
     booking_id INT IDENTITY PRIMARY KEY,
     asp_id INT,
@@ -166,7 +166,7 @@ CREATE TABLE Booking
 );
 
 -- FacilityReservation Table
-CREATE TABLE FacilityReservation 
+CREATE TABLE FacilityReservation
 (
     fr_id INT IDENTITY PRIMARY KEY,
     booking_id INT,
@@ -178,7 +178,7 @@ CREATE TABLE FacilityReservation
 );
 
 -- BookingGuest Table (Associative Entity)
-CREATE TABLE BookingGuest 
+CREATE TABLE BookingGuest
 (
     booking_id INT,
     guest_id INT,
@@ -188,7 +188,7 @@ CREATE TABLE BookingGuest
 );
 
 -- Payment Table
-CREATE TABLE Payment 
+CREATE TABLE Payment
 (
     payment_id INT IDENTITY PRIMARY KEY,
     reservation_number INT,
@@ -199,7 +199,7 @@ CREATE TABLE Payment
 );
 
 -- Discount Table
-CREATE TABLE Discount 
+CREATE TABLE Discount
 (
     discount_id INT IDENTITY PRIMARY KEY,
     reservation_number INT,
