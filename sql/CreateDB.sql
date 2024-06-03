@@ -19,9 +19,9 @@ GO
 -- Create Tables
 
 -- Hotel Table
-CREATE TABLE Hotel
+CREATE TABLE Hotel 
 (
-    hotel_id INT PRIMARY KEY,
+    hotel_id INT IDENTITY PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     address VARCHAR(200) NOT NULL,
     country VARCHAR(50) NOT NULL,
@@ -30,9 +30,9 @@ CREATE TABLE Hotel
 );
 
 -- Facility Table
-CREATE TABLE Facility
+CREATE TABLE Facility 
 (
-    facility_id INT PRIMARY KEY,
+    facility_id INT IDENTITY PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     description TEXT,
     status VARCHAR(20) CHECK (status IN ('Available', 'Unavailable', 'Maintenance')),
@@ -41,16 +41,16 @@ CREATE TABLE Facility
 );
 
 -- FacilityType Table
-CREATE TABLE FacilityType
+CREATE TABLE FacilityType 
 (
-    type_id INT PRIMARY KEY,
+    type_id INT IDENTITY PRIMARY KEY,
     name VARCHAR(50) NOT NULL,
     description TEXT,
     capacity INT
 );
 
 -- ServiceCategory Table
-CREATE TABLE ServiceCategory
+CREATE TABLE ServiceCategory 
 (
     code VARCHAR(10) PRIMARY KEY,
     name VARCHAR(50) NOT NULL,
@@ -59,9 +59,9 @@ CREATE TABLE ServiceCategory
 );
 
 -- ServiceItem Table
-CREATE TABLE ServiceItem
+CREATE TABLE ServiceItem 
 (
-    service_id INT PRIMARY KEY,
+    service_id INT IDENTITY PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     description TEXT,
     restrictions TEXT,
@@ -75,7 +75,7 @@ CREATE TABLE ServiceItem
 );
 
 -- FacilityServiceItem Table (Associative Entity)
-CREATE TABLE FacilityServiceItem
+CREATE TABLE FacilityServiceItem 
 (
     facility_id INT,
     service_id INT,
@@ -85,17 +85,17 @@ CREATE TABLE FacilityServiceItem
 );
 
 -- Employee Table
-CREATE TABLE Employee
+CREATE TABLE Employee 
 (
-    employee_id INT PRIMARY KEY,
+    employee_id INT IDENTITY PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     position VARCHAR(50)
 );
 
 -- AdvertisedServicePackage Table
-CREATE TABLE AdvertisedServicePackage
+CREATE TABLE AdvertisedServicePackage 
 (
-    asp_id INT PRIMARY KEY,
+    asp_id INT IDENTITY PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     description TEXT,
     start_date DATE,
@@ -111,7 +111,7 @@ CREATE TABLE AdvertisedServicePackage
 );
 
 -- PackageServiceItem Table (Associative Entity)
-CREATE TABLE PackageServiceItem
+CREATE TABLE PackageServiceItem 
 (
     asp_id INT,
     service_id INT,
@@ -122,9 +122,9 @@ CREATE TABLE PackageServiceItem
 );
 
 -- Customer Table
-CREATE TABLE Customer
+CREATE TABLE Customer 
 (
-    customer_id INT PRIMARY KEY,
+    customer_id INT IDENTITY PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     address VARCHAR(200),
     contact_number VARCHAR(20),
@@ -132,9 +132,9 @@ CREATE TABLE Customer
 );
 
 -- Guest Table
-CREATE TABLE Guest
+CREATE TABLE Guest 
 (
-    guest_id INT PRIMARY KEY,
+    guest_id INT IDENTITY PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     address VARCHAR(200),
     contact_number VARCHAR(20),
@@ -142,19 +142,20 @@ CREATE TABLE Guest
 );
 
 -- Reservation Table
-CREATE TABLE Reservation
+CREATE TABLE Reservation 
 (
-    reservation_number INT PRIMARY KEY,
+    reservation_number INT IDENTITY PRIMARY KEY,
     customer_id INT,
     total_amount_due DECIMAL(10, 2),
     deposit_due DECIMAL(10, 2),
     payment_information TEXT,
     FOREIGN KEY (customer_id) REFERENCES Customer(customer_id) ON DELETE SET NULL
 );
---Booking Table
-CREATE TABLE Booking
+
+-- Booking Table
+CREATE TABLE Booking 
 (
-    booking_id INT PRIMARY KEY,
+    booking_id INT IDENTITY PRIMARY KEY,
     asp_id INT,
     reservation_number INT,
     quantity INT,
@@ -165,9 +166,9 @@ CREATE TABLE Booking
 );
 
 -- FacilityReservation Table
-CREATE TABLE FacilityReservation
+CREATE TABLE FacilityReservation 
 (
-    fr_id INT PRIMARY KEY,
+    fr_id INT IDENTITY PRIMARY KEY,
     booking_id INT,
     facility_id INT,
     start_date_time DATETIME,
@@ -177,7 +178,7 @@ CREATE TABLE FacilityReservation
 );
 
 -- BookingGuest Table (Associative Entity)
-CREATE TABLE BookingGuest
+CREATE TABLE BookingGuest 
 (
     booking_id INT,
     guest_id INT,
@@ -187,9 +188,9 @@ CREATE TABLE BookingGuest
 );
 
 -- Payment Table
-CREATE TABLE Payment
+CREATE TABLE Payment 
 (
-    payment_id INT PRIMARY KEY,
+    payment_id INT IDENTITY PRIMARY KEY,
     reservation_number INT,
     amount DECIMAL(10, 2),
     payment_method VARCHAR(50),
@@ -198,9 +199,9 @@ CREATE TABLE Payment
 );
 
 -- Discount Table
-CREATE TABLE Discount
+CREATE TABLE Discount 
 (
-    discount_id INT PRIMARY KEY,
+    discount_id INT IDENTITY PRIMARY KEY,
     reservation_number INT,
     amount DECIMAL(10, 2),
     employee_id INT,
