@@ -11,16 +11,16 @@ INSERT INTO @serviceItemList (serviceItemID, quantity)
 VALUES (1, 2),  -- Example service item ID and quantity
        (2, 3);  -- Example service item ID and quantity
 
--- Execute the stored procedure with test data
+-- Execute the stored procedure with test data using a valid employee ID
 EXEC usp_createPackage
-    @packageName = 'This is a packge name',        -- Example package name
+    @packageName = 'Bons Special treat',        -- Example package name
     @serviceItemList = @serviceItemList,     -- Example service item list
-    @description = 'Bon is a child', -- Example description
+    @description = 'He(Bon) is a child', -- Example description
     @validPeriodStartDate = '2024-06-01',    -- Example start date
     @validPeriodEndDate = '2024-06-30',      -- Example end date
     @advertisedPrice = 999.99,               -- Example advertised price
-    @advertisedCurrency = 'SGD',             -- Example currency
-    @employeeID = 101,                       -- Example employee ID
+    @advertisedCurrency = 'AUD',             -- Example currency
+    @employeeID = 1,                         -- Example employee ID that exists
     @advertisedPackageID = @advertisedPackageID OUTPUT;  -- Output parameter
 
 -- Check the output to verify the new package ID

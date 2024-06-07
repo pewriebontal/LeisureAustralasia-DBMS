@@ -1,12 +1,15 @@
 -- Define the table type for ServiceItemList
-CREATE TYPE ServiceItemList AS TABLE (
-    serviceItemID INT,
-    quantity INT
-);
+IF NOT EXISTS (SELECT * FROM sys.types WHERE is_table_type = 1 AND name = 'ServiceItemList')
+BEGIN
+    CREATE TYPE ServiceItemList AS TABLE (
+        serviceItemID INT,
+        quantity INT
+    );
+END
 GO
 
 -- Create the stored procedure (usp_createPackage)
-CREATE PROCEDURE usp_createPackage
+CREATE OR ALTER PROCEDURE usp_createPackage
     @packageName VARCHAR(255),                  -- Name of the package
     @serviceItemList ServiceItemList READONLY,  -- Table-valued parameter for list of service items and quantities
     @description TEXT = NULL,                   -- Description of the package (Allow NULL description)
@@ -40,7 +43,7 @@ BEGIN
             RETURN;
         END
 
-        IF NOT EXISTS (SELECT 1 FROM Employee WHERE employeeID = @employeeID)
+        IF NOT EXISTS (SELECT 1 FROM Employee WHERE employee_id = @employeeID)
         BEGIN
             RAISERROR('Employee not found.', 16, 1);
             RETURN;
@@ -58,10 +61,10 @@ BEGIN
             FROM AdvertisedServicePackage
             WHERE name = @packageName
                 AND (
-                    (@validPeriodStartDate BETWEEN startDate AND endDate)
-                    OR (@validPeriodEndDate BETWEEN startDate AND endDate)
-                    OR (startDate BETWEEN @validPeriodStartDate AND @validPeriodEndDate)
-                    OR (endDate BETWEEN @validPeriodStartDate AND @validPeriodEndDate)
+                    (@validPeriodStartDate BETWEEN start_date AND end_date)
+                    OR (@validPeriodEndDate BETWEEN start_date AND end_date)
+                    OR (start_date BETWEEN @validPeriodStartDate AND @validPeriodEndDate)
+                    OR (end_date BETWEEN @validPeriodStartDate AND @validPeriodEndDate)
                 )
         )
         BEGIN
@@ -84,7 +87,7 @@ BEGIN
 
         -- Insert into AdvertisedServicePackage
         INSERT INTO AdvertisedServicePackage
-        (name, description, startDate, endDate, advertisedPrice, advertisedCurrency, status, gracePeriod, employeeID)
+        (name, description, start_date, end_date, advertised_price, advertised_currency, status, grace_period, employee_id)
         VALUES
         (@packageName, @description, @validPeriodStartDate, @validPeriodEndDate, @advertisedPrice, @advertisedCurrency, 'Active', 7, @employeeID);
 
