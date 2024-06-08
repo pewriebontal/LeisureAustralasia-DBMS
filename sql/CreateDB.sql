@@ -29,6 +29,15 @@ CREATE TABLE Hotel
     description TEXT
 );
 
+-- FacilityType Table
+CREATE TABLE FacilityType
+(
+    type_id INT PRIMARY KEY,
+    name VARCHAR(50) NOT NULL,
+    description TEXT,
+    capacity INT
+);
+
 -- Facility Table
 CREATE TABLE Facility
 (
@@ -37,16 +46,9 @@ CREATE TABLE Facility
     description TEXT,
     status VARCHAR(20) CHECK (status IN ('Available', 'Unavailable', 'Maintenance')),
     hotel_id INT,
-    FOREIGN KEY (hotel_id) REFERENCES Hotel(hotel_id) ON DELETE CASCADE
-);
-
--- FacilityType Table
-CREATE TABLE FacilityType
-(
-    type_id INT PRIMARY KEY,
-    name VARCHAR(50) NOT NULL,
-    description TEXT,
-    capacity INT
+    type_id INT,
+    FOREIGN KEY (hotel_id) REFERENCES Hotel(hotel_id) ON DELETE CASCADE,
+    FOREIGN KEY (type_id) REFERENCES FacilityType(type_id) ON DELETE CASCADE
 );
 
 -- ServiceCategory Table
@@ -71,7 +73,9 @@ CREATE TABLE ServiceItem
     available_times VARCHAR(100),
     base_cost DECIMAL(10, 2),
     base_currency VARCHAR(3),
-    capacity INT
+    capacity INT,
+    category_code VARCHAR(10),
+    FOREIGN KEY (category_code) REFERENCES ServiceCategory(code) ON DELETE SET NULL
 );
 
 -- FacilityServiceItem Table (Associative Entity)
@@ -209,6 +213,9 @@ CREATE TABLE Discount
     FOREIGN KEY (employee_id) REFERENCES Employee(employee_id) ON DELETE SET NULL
 );
 
+
+/* Sample Data */
+
 USE LeisureAustralasiaDB;
 
 -- Insert sample data into each table
@@ -228,34 +235,9 @@ VALUES
     ('009', 'Colombo Beach Resort', '606 Colombo Blvd, Colombo', 'Sri Lanka', '9012345678', 'A beach resort in Colombo.'),
     ('010', 'Mumbai City Hotel', '707 Mumbai Rd, Mumbai', 'India', '0123456789', 'A bustling hotel in Mumbai city center.');
 
--- Sample data for Facility Table
-INSERT INTO Facility
-    (facility_id, name, description, status, hotel_id)
-VALUES
-    ('001', 'Swimming Pool', 'Outdoor pool with sun loungers', 'Available', 1),
-    ('002', 'Gym', 'Fully equipped gym', 'Available', 1),
-    ('003', 'Conference Room', 'Spacious conference room', 'Maintenance', 2),
-    ('004', 'Hotel Lobby', 'Elegant lobby with seating area', 'Available', 3),
-    ('005', 'Spa', 'Relaxing spa with massage services', 'Available', 2),
-    ('006', 'Restaurant', 'Gourmet restaurant with diverse menu', 'Available', 1),
-    ('007', 'Bar', 'Cocktail bar with a wide selection of drinks', 'Available', 1),
-    ('008', 'Business Center', 'Business center with computers and printers', 'Available', 3),
-    ('009', 'Parking Garage', 'Secure underground parking', 'Available', 2),
-    ('010', 'Tennis Court', 'Outdoor tennis court', 'Maintenance', 1),
-    ('011', 'Meeting Room', 'Small meeting room for private meetings', 'Available', 2),
-    ('012', 'Rooftop Terrace', 'Rooftop terrace with city views', 'Available', 3),
-    ('013', 'Kids Play Area', 'Indoor play area for children', 'Available', 1),
-    ('014', 'Laundry Room', 'Self-service laundry facilities', 'Available', 2),
-    ('015', 'Library', 'Quiet library with a selection of books', 'Available', 3),
-    ('016', 'Sauna', 'Traditional Finnish sauna', 'Available', 2),
-    ('017', 'Cinema Room', 'Private cinema room with comfortable seating', 'Available', 1),
-    ('018', 'Garden', 'Beautiful garden with walking paths', 'Available', 3),
-    ('019', 'Game Room', 'Game room with arcade machines and board games', 'Available', 2),
-    ('020', 'Pet Care Center', 'Facility for pet care and grooming', 'Available', 1);
-
--- Sample data for FacilityType Table
+-- Insert sample data into FacilityType Table
 INSERT INTO FacilityType
-    (type_id ,name, description, capacity)
+    (type_id, name, description, capacity)
 VALUES
     ('001', 'Standard Room', 'A room with a queen bed', 2),
     ('002', 'Family Room', 'A room with a queen bed and two single beds', 4),
@@ -278,7 +260,23 @@ VALUES
     ('019', 'Pet Care Center', 'Facility for pet care and grooming', 10),
     ('020', 'Parking Garage', 'Secure underground parking', 100);
 
--- Sample data for ServiceCategory Table
+
+-- Insert sample data into Facility Table
+INSERT INTO Facility
+    (facility_id, name, description, status, hotel_id, type_id)
+VALUES
+    ('001', 'Swimming Pool', 'Outdoor pool with sun loungers', 'Available', 1, 4),
+    ('002', 'Gym', 'Fully equipped gym', 'Available', 1, 5),
+    ('003', 'Conference Room', 'Spacious conference room', 'Maintenance', 2, 3),
+    ('004', 'Hotel Lobby', 'Elegant lobby with seating area', 'Available', 3, 9),
+    ('005', 'Spa', 'Relaxing spa with massage services', 'Available', 2, 6),
+    ('006', 'Restaurant', 'Gourmet restaurant with diverse menu', 'Available', 1, 7),
+    ('007', 'Bar', 'Cocktail bar with a wide selection of drinks', 'Available', 1, 8),
+    ('008', 'Business Center', 'Business center with computers and printers', 'Available', 3, 9),
+    ('009', 'Parking Garage', 'Secure underground parking', 'Available', 2, 20),
+    ('010', 'Tennis Court', 'Outdoor tennis court', 'Maintenance', 1, 4);
+
+-- Insert sample data into ServiceCategory Table
 INSERT INTO ServiceCategory
     (code, name, description, type)
 VALUES
@@ -291,92 +289,37 @@ VALUES
     ('TOUR', 'Site-Seeing Tours', 'Tours for guests', 'Service'),
     ('TAXI', 'Taxis', 'Taxi services', 'Service'),
     ('SPA', 'Spa Services', 'Spa and wellness services', 'Service'),
-    ('TRANS', 'Transportation', 'Transportation services', 'Service'),
-    ('BUSN', 'Business Services', 'Business-related services', 'Service'),
-    ('PETS', 'Pet Services', 'Services for guests with pets', 'Service'),
-    ('KIDS', 'Kids Activities', 'Activities for children', 'Service'),
-    ('PARK', 'Parking', 'Parking facilities', 'Service'),
-    ('HOUSE', 'Housekeeping', 'Room cleaning and housekeeping services', 'Service'),
-    ('CONC', 'Concierge', 'Concierge services', 'Service'),
-    ('INTR', 'Internet Services', 'Internet and Wi-Fi access', 'Service'),
-    ('SEC', 'Security', 'Security services', 'Service');
+    ('TRANS', 'Transportation', 'Transportation services', 'Service');
 
--- Sample data for ServiceItem Table
+-- Insert sample data into ServiceItem Table
 INSERT INTO ServiceItem
-    (service_id, name, description, restrictions, notes, comments, status, available_times, base_cost, base_currency, capacity)
+    (service_id, name, description, restrictions, notes, comments, status, available_times, base_cost, base_currency, capacity, category_code)
 VALUES
-    ('001', 'Breakfast Buffet', 'All you can eat breakfast buffet', 'None', 'Served from 7-10 AM', 'Popular with guests', 'Available', '7:00-10:00', 20.00, 'AUD', 100),
-    ('002', 'Room Cleaning', 'Daily room cleaning service', 'None', 'Available daily', 'Contact housekeeping for more details', 'Available', '9:00-17:00', 15.00, 'AUD', 1),
-    ('003', 'Wi-Fi', 'High-speed internet access', 'None', 'Available in all rooms', 'Complimentary for guests', 'Available', '24 hours', 0.00, 'AUD', 1),
-    ('004', 'Standard Room Night Stay', 'One night stay in a standard room', 'No restrictions', 'Standard amenities included', 'Comfortable and spacious', 'Available', '24/7', 100.00, 'AUD', 2),
-    ('005', 'Conference Booking', 'Booking for a conference hall', 'Pre-booking required', 'Includes basic audio-visual equipment', 'Ideal for business meetings', 'Unavailable', '9:00 AM - 5:00 PM', 500.00, 'AUD', 100),
-    ('006', 'Gym Access', 'Access to the gym', 'Guests only', 'Bring your own towel', 'State-of-the-art equipment', 'Unavailable', '6:00 AM - 10:00 PM', 10.00, 'AUD', 20),
-    ('007', 'Dinner Buffet', 'A buffet dinner', 'None', 'Wide variety of dishes available', 'Includes dessert options', 'Available', '6:00 PM - 9:00 PM', 30.00, 'AUD', 50),
-    ('008', 'Spa Treatment', 'Full body spa treatment', 'Pre-booking required', 'Includes complimentary drinks', 'Relaxing and rejuvenating', 'Available', '9:00 AM - 8:00 PM', 150.00, 'AUD', 5),
-    ('009', 'Airport Shuttle', 'Shuttle service to and from the airport', 'Book 24 hours in advance', 'Operates every hour', 'Convenient for guests', 'Available', '5:00 AM - 11:00 PM', 25.00, 'AUD', 15),
-    ('010', 'Laundry Service', 'Full laundry service', 'None', 'Same day service available', 'Contact housekeeping for details', 'Available', '9:00 AM - 5:00 PM', 10.00, 'AUD', 10),
-    ('011', 'Mini Bar', 'In-room mini bar', 'Charge per consumption', 'Replenished daily', 'Wide selection of drinks and snacks', 'Available', '24/7', 0.00, 'AUD', 1),
-    ('012', 'Parking', 'Secure underground parking', 'Guests only', '24-hour security', 'Convenient and safe', 'Available', '24/7', 15.00, 'AUD', 50),
-    ('013', 'Business Center', 'Access to business center facilities', 'Guests only', 'Includes internet, printing, and fax services', 'Open daily', 'Available', '8:00 AM - 8:00 PM', 0.00, 'AUD', 10),
-    ('014', 'Late Checkout', 'Extended stay beyond normal checkout time', 'Subject to availability', 'Contact front desk for details', 'Convenient for late flights', 'Available', '11:00 AM - 3:00 PM', 20.00, 'AUD', 1),
-    ('015', 'Tour Booking', 'Booking service for local tours', 'Pre-booking required', 'Various tours available', 'Explore local attractions', 'Available', '9:00 AM - 6:00 PM', 50.00, 'AUD', 20),
-    ('016', 'Pet Service', 'Pet care service', 'Pets allowed', 'Includes feeding and walking', 'For small pets only', 'Available', '7:00 AM - 7:00 PM', 30.00, 'AUD', 5),
-    ('017', 'Car Rental', 'Car rental service', 'Valid driver’s license required', 'Various car models available', 'Book in advance', 'Available', '8:00 AM - 8:00 PM', 60.00, 'AUD', 10),
-    ('018', 'Breakfast in Bed', 'Breakfast served in your room', 'None', 'Available upon request', 'Luxury breakfast options', 'Available', '7:00 AM - 10:00 AM', 25.00, 'AUD', 1),
-    ('019', 'Afternoon Tea', 'Afternoon tea service', 'None', 'Includes a selection of teas and pastries', 'Elegant and relaxing', 'Available', '2:00 PM - 5:00 PM', 20.00, 'AUD', 30),
-    ('020', 'Valet Service', 'Car valet service', 'None', '24-hour service available', 'Convenient for guests', 'Available', '24/7', 10.00, 'AUD', 1);
+    ('001', 'Breakfast Buffet', 'All you can eat breakfast buffet', 'None', 'Served from 7-10 AM', 'Popular with guests', 'Available', '7:00-10:00', 20.00, 'AUD', 100, 'FOOD'),
+    ('002', 'Room Cleaning', 'Daily room cleaning service', 'None', 'Available daily', 'Contact housekeeping for more details', 'Available', '9:00-17:00', 15.00, 'AUD', 1, 'LAUN'),
+    ('003', 'Wi-Fi', 'High-speed internet access', 'None', 'Available in all rooms', 'Complimentary for guests', 'Available', '24 hours', 0.00, 'AUD', 1, 'ENTR'),
+    ('004', 'Standard Room Night Stay', 'One night stay in a standard room', 'No restrictions', 'Standard amenities included', 'Comfortable and spacious', 'Available', '24/7', 100.00, 'AUD', 2, 'ACCM'),
+    ('005', 'Conference Booking', 'Booking for a conference hall', 'Pre-booking required', 'Includes basic audio-visual equipment', 'Ideal for business meetings', 'Unavailable', '9:00 AM - 5:00 PM', 500.00, 'AUD', 100, 'EVENT'),
+    ('006', 'Gym Access', 'Access to the gym', 'Guests only', 'Bring your own towel', 'State-of-the-art equipment', 'Unavailable', '6:00 AM - 10:00 PM', 10.00, 'AUD', 20, 'GYM'),
+    ('007', 'Dinner Buffet', 'A buffet dinner', 'None', 'Wide variety of dishes available', 'Includes dessert options', 'Available', '6:00 PM - 9:00 PM', 30.00, 'AUD', 50, 'FOOD'),
+    ('008', 'Spa Treatment', 'Full body spa treatment', 'Pre-booking required', 'Includes complimentary drinks', 'Relaxing and rejuvenating', 'Available', '9:00 AM - 8:00 PM', 150.00, 'AUD', 5, 'SPA'),
+    ('009', 'Airport Shuttle', 'Shuttle service to and from the airport', 'Book 24 hours in advance', 'Operates every hour', 'Convenient for guests', 'Available', '5:00 AM - 11:00 PM', 25.00, 'AUD', 15, 'TRANS'),
+    ('010', 'Laundry Service', 'Full laundry service', 'None', 'Same day service available', 'Contact housekeeping for details', 'Available', '9:00 AM - 5:00 PM', 10.00, 'AUD', 10, 'LAUN');
 
 
--- Sample data for FacilityServiceItem Table
+-- Insert sample data into FacilityServiceItem Table
 INSERT INTO FacilityServiceItem
     (facility_id, service_id)
 VALUES
     (1, 1),
-    -- Swimming Pool - Breakfast Buffet
     (2, 2),
-    -- Gym - Room Cleaning
-    (1, 7),
-    -- Swimming Pool - Dinner Buffet
-    (2, 6),
-    -- Gym - Gym Access
     (3, 5),
-    -- Conference Room - Conference Booking
-    (4, 13),
-    -- Hotel Lobby - Business Center
+    (4, 3),
     (5, 8),
-    -- Spa - Spa Treatment
     (6, 7),
-    -- Restaurant - Dinner Buffet
-    (7, 20),
-    -- Bar - Valet Service
-    (8, 13),
-    -- Business Center - Business Center
-    (9, 12),
-    -- Parking Garage - Parking
-    (10, 15),
-    -- Tennis Court - Tour Booking
-    (11, 14),
-    -- Meeting Room - Late Checkout
-    (12, 18),
-    -- Rooftop Terrace - Breakfast in Bed
-    (13, 19),
-    -- Kids Play Area - Afternoon Tea
-    (14, 10),
-    -- Laundry Room - Laundry Service
-    (15, 14),
-    -- Library - Late Checkout
-    (16, 8),
-    -- Sauna - Spa Treatment
-    (17, 16),
-    -- Cinema Room - Cinema Room
-    (18, 17),
-    -- Garden - Car Rental
-    (19, 3),
-    -- Game Room - Wi-Fi
-    (20, 16);
--- Pet Care Center - Pet Service
+    (7, 10);
 
--- Sample data for Employee Table
+-- Insert sample data into Employee Table
 INSERT INTO Employee
     (employee_id, name, position)
 VALUES
@@ -391,77 +334,60 @@ VALUES
     ('009', 'Daniel Taylor', 'IT Support Specialist'),
     ('010', 'Laura Anderson', 'Marketing Manager');
 
-
--- Sample data for AdvertisedServicePackage Table
+-- Insert sample data into AdvertisedServicePackage Table
 INSERT INTO AdvertisedServicePackage
     (asp_id, name, description, start_date, end_date, advertised_price, advertised_currency, inclusions, exclusions, status, grace_period, employee_id)
 VALUES
     ('001', 'Weekend Getaway', 'Two-night stay with breakfast included', '2024-06-01', '2024-06-30', 299.99, 'AUD', 'Breakfast, Free Wi-Fi', 'No pets allowed', 'Active', 7, 1),
-    ('002', 'Family Fun Package', 'Three-night stay with tickets to local attractions', '2024-07-01', '2024-07-31', 499.99, 'AUD', 'Tickets to zoo, Breakfast', 'No pets allowed', 'Active', 7, 1),
-    ('003', 'Romantic Escape', 'One-night stay with a candlelight dinner', '2024-08-01', '2024-08-31', 199.99, 'AUD', 'Dinner, Champagne, Free Wi-Fi', 'No children allowed', 'Active', 5, 2),
-    ('004', 'Adventure Package', 'Four-night stay with adventure sports', '2024-09-01', '2024-09-30', 799.99, 'AUD', 'Adventure sports, Breakfast', 'No pets allowed', 'Active', 10, 3),
-    ('005', 'Luxury Retreat', 'Five-night stay with spa access', '2024-10-01', '2024-10-31', 999.99, 'AUD', 'Spa access, Breakfast, Dinner', 'No pets allowed', 'Active', 7, 4),
-    ('006', 'Cultural Tour', 'Three-night stay with guided city tours', '2024-11-01', '2024-11-30', 599.99, 'AUD', 'City tours, Breakfast', 'No pets allowed', 'Active', 7, 5),
-    ('007', 'Winter Wonderland', 'Two-night stay with ski pass', '2024-12-01', '2024-12-31', 399.99, 'AUD', 'Ski pass, Breakfast', 'No pets allowed', 'Active', 7, 6),
-    ('008', 'Spring Break Special', 'Three-night stay with pool access', '2025-01-01', '2025-01-31', 449.99, 'AUD', 'Pool access, Breakfast', 'No pets allowed', 'Active', 7, 7);
+    ('002', 'Family Fun Package', 'Three-night stay with tickets to local attractions', '2024-07-01', '2024-07-31', 499.99, 'AUD', 'Tickets to zoo, Breakfast', 'No pets allowed', 'Active', 7, 2),
+    ('003', 'Romantic Escape', 'One-night stay with a candlelight dinner', '2024-08-01', '2024-08-31', 199.99, 'AUD', 'Dinner, Champagne, Free Wi-Fi', 'No children allowed', 'Active', 5, 3),
+    ('004', 'Adventure Package', 'Four-night stay with adventure sports', '2024-09-01', '2024-09-30', 799.99, 'AUD', 'Adventure sports, Breakfast', 'No pets allowed', 'Active', 10, 4),
+    ('005', 'Luxury Retreat', 'Five-night stay with spa access', '2024-10-01', '2024-10-31', 999.99, 'AUD', 'Spa access, Breakfast, Dinner', 'No pets allowed', 'Active', 7, 5);
 
--- Sample data for PackageServiceItem Table
+-- Insert sample data into PackageServiceItem Table
 INSERT INTO PackageServiceItem
     (asp_id, service_id, quantity)
 VALUES
-    (1, 1, 1),
+    (1, 1, 2),
     -- Weekend Getaway - Breakfast Buffet
-    (2, 2, 1),
-    -- Family Fun Package - Room Cleaning
     (1, 4, 2),
     -- Weekend Getaway - Standard Room Night Stay
-    (1, 7, 1),
-    -- Weekend Getaway - Dinner Buffet
-    (2, 6, 1),
-    -- Family Fun Package - Gym Access
-    (2, 3, 1),
-    -- Family Fun Package - Wi-Fi
-    (3, 8, 1),
-    -- Business Trip - Spa Treatment
-    (3, 5, 1),
-    -- Business Trip - Conference Booking
-    (3, 9, 1),
-    -- Business Trip - Airport Shuttle
-    (4, 10, 1),
-    -- Romantic Escape - Laundry Service
-    (4, 11, 1),
-    -- Romantic Escape - Mini Bar
-    (4, 18, 1),
-    -- Romantic Escape - Breakfast in Bed
-    (5, 14, 1),
-    -- Adventure Package - Late Checkout
-    (5, 17, 1),
-    -- Adventure Package - Car Rental
-    (5, 15, 1),
-    -- Adventure Package - Tour Booking
-    (6, 16, 1),
-    -- Pet Friendly Package - Pet Service
-    (6, 12, 1),
-    -- Pet Friendly Package - Parking
-    (6, 19, 1);
--- Pet Friendly Package - Afternoon Tea
+    (2, 1, 3),
+    -- Family Fun Package - Breakfast Buffet
+    (2, 4, 3),
+    -- Family Fun Package - Standard Room Night Stay
+    (3, 4, 1),
+    -- Romantic Escape - Standard Room Night Stay
+    (3, 7, 1),
+    -- Romantic Escape - Dinner Buffet
+    (4, 4, 4),
+    -- Adventure Package - Standard Room Night Stay
+    (4, 9, 4),
+    -- Adventure Package - Airport Shuttle
+    (5, 4, 5),
+    -- Luxury Retreat - Standard Room Night Stay
+    (5, 8, 5);
+-- Luxury Retreat - Spa Treatment
 
 -- Sample data for Customer Table
+-- Insert sample data into Customer Table
 INSERT INTO Customer
     (customer_id, name, address, contact_number, email)
 VALUES
     ('001', 'Alice Brown', '789 Market St, Melbourne', '555123456', 'alice.brown@example.com'),
     ('002', 'Bob Green', '321 Pine Rd, Brisbane', '555654321', 'bob.green@example.com'),
     ('003', 'Charlie White', '456 Oak St, Sydney', '555789012', 'charlie.white@example.com'),
-    ('004', 'Pewrie Bontal', '760111 Pine Rd, Brisbane', '555654321', 'pewrie@bontal.net'),
-    ('005', 'Min Thu Khaing', '760809 Yishun Ring Road', '87476403', '0x@bontal.net'),
-    ('006', 'Thet Paing Hmue', '310145 Block 145 Lorong 2 Toapayoh 36-302', '82845157', 'lnvlps11@gmail.com'),
-    ('007', 'Emily Johnson', '987 Willow St, Adelaide', '555456789', 'emily.johnson@example.com'),
-    ('008', 'Frank Williams', '654 Maple Ave, Hobart', '555567890', 'frank.williams@example.com'),
-    ('009', 'Grace Taylor', '321 Cedar Rd, Darwin', '555678901', 'grace.taylor@example.com'),
-    ('010', 'Henry Brown', '789 Birch St, Canberra', '555789123', 'henry.brown@example.com'),
-    ('011', 'Isla Wilson', '123 Spruce St, Newcastle', '555890234', 'isla.wilson@example.com'),
-    ('012', 'Jack Martin', '456 Ash St, Gold Coast', '555901345', 'jack.martin@example.com');
+    ('004', 'David Black', '123 Elm St, Perth', '555345678', 'david.black@example.com'),
+    ('005', 'Emily Gray', '987 Willow St, Adelaide', '555456789', 'emily.gray@example.com'),
+    ('006', 'Pewrie Bontal', '760111 Pine Rd, Brisbane', '555654321', 'pewrie@bontal.net'),
+    ('007', 'Min Thu Khaing', '760809 Yishun Ring Road', '87476403', '0x@bontal.net'),
+    ('008', 'Thet Paing Hmue', '310145 Block 145 Lorong 2 Toapayoh 36-302', '82845157', 'lnvlps11@gmail.com'),
+    ('009', 'Emily Johnson', '987 Willow St, Adelaide', '555456789', 'emily.johnson@example.com'),
+    ('010', 'Frank Williams', '654 Maple Ave, Hobart', '555567890', 'frank.williams@example.com'),
+    ('011', 'Grace Taylor', '321 Cedar Rd, Darwin', '555678901', 'grace.taylor@example.com'),
+    ('012', 'Henry Brown', '789 Birch St, Canberra', '555789123', 'henry.brown@example.com'),
+    ('013', 'Isla Wilson', '123 Spruce St, Newcastle', '555890234', 'isla.wilson@example.com'),
+    ('014', 'Jack Martin', '456 Ash St, Gold Coast', '555901345', 'jack.martin@example.com');
 
 
 -- Sample data for Guest Table
@@ -576,14 +502,16 @@ VALUES
 
 -- Sample data for Payment Table
 --  ????????????????????????
+
+-- Insert sample data into Payment Table
 INSERT INTO Payment
     (payment_id, reservation_number, amount, payment_method, payment_date)
 VALUES
     ('001', 1, 299.99, 'Credit Card', '2024-06-01'),
     ('002', 2, 499.99, 'Debit Card', '2024-07-01'),
-    ('003', 3, 150.00, 'Credit Card', '2024-06-02'),
-    ('004', 4, 200.00, 'Debit Card', '2024-06-03'),
-    ('005', 5, 100.00, 'Cash', '2024-06-04'),
+    ('003', 3, 199.99, 'PayPal', '2024-08-01'),
+    ('004', 4, 799.99, 'Bank Transfer', '2024-09-01'),
+    ('005', 5, 999.99, 'Credit Card', '2024-10-01'),
     ('006', 6, 250.00, 'Credit Card', '2024-06-05'),
     ('007', 7, 350.00, 'Bank Transfer', '2024-06-06'),
     ('008', 8, 400.00, 'Credit Card', '2024-06-07'),
