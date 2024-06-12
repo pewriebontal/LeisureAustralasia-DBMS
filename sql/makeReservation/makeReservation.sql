@@ -1,10 +1,45 @@
+-- Define the table type for Customer Details
+IF NOT EXISTS (SELECT * FROM sys.types WHERE is_table_type = 1 AND name = 'CustomerTableType')
+BEGIN
+    CREATE TYPE CustomerTableType AS TABLE (
+        name VARCHAR(100),
+        address VARCHAR(200),
+        contact_number VARCHAR(20),
+        email VARCHAR(100)
+    );
+END
+GO
+
+-- Define the table type for Service List
+IF NOT EXISTS (SELECT * FROM sys.types WHERE is_table_type = 1 AND name = 'ServiceListTableType')
+BEGIN
+    CREATE TYPE ServiceListTableType AS TABLE (
+        service_id INT,
+        quantity INT,
+        start_date DATE,
+        end_date DATE
+    );
+END
+GO
+
+-- Define the table type for Guest Details
+IF NOT EXISTS (SELECT * FROM sys.types WHERE is_table_type = 1 AND name = 'GuestTableType')
+BEGIN
+    CREATE TYPE GuestTableType AS TABLE (
+        name VARCHAR(100),
+        address VARCHAR(200),
+        contact_number VARCHAR(20),
+        email VARCHAR(100)
+    );
+END
+GO
+
 -- Stored Procedure to Make a Reservation
 CREATE OR ALTER PROCEDURE usp_makeReservation
     @customer_details CustomerTableType READONLY,  -- Table-valued parameter for customer details
     @service_list ServiceListTableType READONLY,   -- Table-valued parameter for list of services/packages reserved
     @guest_list GuestTableType READONLY,           -- Table-valued parameter for guest details
-    @reservation_id INT OUTPUT,                    -- Output parameter for the ID of the created reservation
-    @cancel_reservation_number INT = NULL          -- Optional parameter for the reservation number to cancel
+    @reservation_id INT OUTPUT                     -- Output parameter for the ID of the created reservation
 AS
 BEGIN
     SET NOCOUNT ON;  -- Improve performance
@@ -30,31 +65,14 @@ BEGIN
         END
 
         -- Check if all services in the list exist
-        DECLARE @invalid_services TABLE (service_id INT);
-        INSERT INTO @invalid_services (service_id)
-        SELECT SL.service_id
-        FROM @service_list SL
-        WHERE NOT EXISTS (SELECT 1 FROM ServiceItem WHERE service_id = SL.service_id);
-
-        IF EXISTS (SELECT 1 FROM @invalid_services)
+        IF EXISTS (
+            SELECT 1
+            FROM @service_list SL
+            WHERE NOT EXISTS (SELECT 1 FROM ServiceItem WHERE service_id = SL.service_id)
+        )
         BEGIN
-            SELECT service_id FROM @invalid_services;  -- Output invalid service IDs
             RAISERROR('One or more services in the list do not exist.', 16, 1);
             RETURN;
-        END
-
-        -- If a reservation number is provided for cancellation, cancel the reservation
-        IF @cancel_reservation_number IS NOT NULL
-        BEGIN
-            -- Delete related records from BookingGuest, FacilityReservation, Booking, and Payment tables
-            DELETE FROM BookingGuest WHERE booking_id IN (SELECT booking_id FROM Booking WHERE reservation_number = @cancel_reservation_number);
-            DELETE FROM FacilityReservation WHERE booking_id IN (SELECT booking_id FROM Booking WHERE reservation_number = @cancel_reservation_number);
-            DELETE FROM Booking WHERE reservation_number = @cancel_reservation_number;
-            DELETE FROM Payment WHERE reservation_number = @cancel_reservation_number;
-            DELETE FROM Discount WHERE reservation_number = @cancel_reservation_number;
-            DELETE FROM Reservation WHERE reservation_number = @cancel_reservation_number;
-            
-            PRINT 'Existing reservation and related records successfully deleted.';
         END
 
         -- Start a transaction to ensure atomicity
