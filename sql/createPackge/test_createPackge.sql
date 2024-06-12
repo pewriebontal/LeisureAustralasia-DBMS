@@ -7,9 +7,13 @@ DECLARE @advertisedPackageID INT;
 DECLARE @serviceItemList ServiceItemList;
 
 -- Insert test data into the table-valued variable
-INSERT INTO @serviceItemList (serviceItemID, quantity)
-VALUES (1, 2),  -- Example service item ID and quantity
-       (2, 3);  -- Example service item ID and quantity
+INSERT INTO @serviceItemList
+    (serviceItemID, quantity)
+VALUES
+    (1, 2),
+    -- Example service item ID and quantity
+    (2, 3);
+-- Example service item ID and quantity
 
 -- Execute the stored procedure with test data using a valid employee ID
 EXEC usp_createPackage
@@ -21,7 +25,8 @@ EXEC usp_createPackage
     @advertisedPrice = 999.99,               -- Example advertised price
     @advertisedCurrency = 'AUD',             -- Example currency
     @employeeID = 1,                         -- Example employee ID that exists
-    @advertisedPackageID = @advertisedPackageID OUTPUT;  -- Output parameter
+    @advertisedPackageID = @advertisedPackageID OUTPUT;
+-- Output parameter
 
 -- Check the output to verify the new package ID
 SELECT @advertisedPackageID AS 'Advertised Package ID';

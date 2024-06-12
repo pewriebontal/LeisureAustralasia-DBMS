@@ -52,6 +52,7 @@ BEGIN
 END
 GO
 
+
 -- Create or alter the stored procedure 'usp_makeReservation'
 CREATE OR ALTER PROCEDURE usp_makeReservation
     @customer_details CustomerTableType READONLY,
@@ -186,6 +187,76 @@ BEGIN
 
         -- Raise the error
         RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState);
+    END CATCH
+END;
+GO
+-- Stored Procedure to Cancel a Reservation
+CREATE OR ALTER PROCEDURE usp_cancelReservation
+    @reservation_id INT
+-- Input parameter for the ID of the reservation to be canceled
+AS
+BEGIN
+    SET NOCOUNT ON;
+    -- Improve performance
+
+    BEGIN TRY
+        -- Start a transaction to ensure atomicity
+        BEGIN TRANSACTION;
+
+        -- Check if the reservation exists
+        IF NOT EXISTS (SELECT 1
+    FROM Reservation
+    WHERE reservation_number = @reservation_id)
+        BEGIN
+        RAISERROR('Reservation with the provided ID does not exist.', 16, 1);
+        RETURN;
+    END
+
+        -- Delete from BookingGuest table
+        DELETE BG
+        FROM BookingGuest BG
+        JOIN Booking B ON BG.booking_id = B.booking_id
+        WHERE B.reservation_number = @reservation_id;
+
+        -- Delete from Guest table
+        DELETE G
+        FROM Guest G
+        WHERE G.guest_id IN (
+            SELECT BG.guest_id
+    FROM BookingGuest BG
+        JOIN Booking B ON BG.booking_id = B.booking_id
+    WHERE B.reservation_number = @reservation_id
+        );
+
+        -- Delete from Booking table
+        DELETE FROM Booking
+        WHERE reservation_number = @reservation_id;
+
+        -- Delete from Reservation table
+        DELETE FROM Reservation
+        WHERE reservation_number = @reservation_id;
+
+        -- Commit the transaction if everything is successful
+        COMMIT TRANSACTION;
+
+        PRINT 'Reservation and related records successfully deleted.';
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0
+            ROLLBACK TRANSACTION; -- Rollback in case of error
+
+        DECLARE @ErrorMessage NVARCHAR(4000);
+        DECLARE @ErrorSeverity INT;
+        DECLARE @ErrorState INT;
+
+        SELECT
+        @ErrorMessage = ERROR_MESSAGE(),
+        @ErrorSeverity = ERROR_SEVERITY(),
+        @ErrorState = ERROR_STATE();
+
+        RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState);
+
+        PRINT 'Error occurred, transaction rolled back.';
     END CATCH
 END;
 GO
